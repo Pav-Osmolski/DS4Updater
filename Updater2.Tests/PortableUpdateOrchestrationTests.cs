@@ -327,9 +327,13 @@ public sealed class PortableUpdateOrchestrationTests
     public void PortableStartupBranchesBeforeLegacyConstructorAndGuardsBothExitHandlers()
     {
         string source = File.ReadAllText(SourcePath("App.xaml.cs"));
-        Assert.IsTrue(source.IndexOf("PortableUpdateRequest.ShouldUsePortableLifetime", StringComparison.Ordinal) >= 0);
-        Assert.IsTrue(source.IndexOf("PortableUpdateRequest.ShouldUsePortableLifetime", StringComparison.Ordinal) <
+        Assert.IsTrue(source.IndexOf("UpdateDeploymentPolicy.Resolve", StringComparison.Ordinal) >= 0);
+        Assert.IsTrue(source.IndexOf("UpdateDeploymentPolicy.Resolve", StringComparison.Ordinal) <
             source.IndexOf("mwd = new MainWindow", StringComparison.Ordinal));
+        Assert.IsTrue(source.IndexOf("new ManagedUpdateWindow", StringComparison.Ordinal) <
+            source.IndexOf("mwd = new MainWindow", StringComparison.Ordinal));
+        Assert.IsTrue(source.IndexOf("portableSession = true;", StringComparison.Ordinal) <
+            source.IndexOf("UpdateDeploymentPolicy.Resolve", StringComparison.Ordinal));
         Assert.AreEqual(2, source.Split("if (portableSession) return;", StringSplitOptions.None).Length - 1);
         StringAssert.Contains(source, "portableSession = true;");
         StringAssert.Contains(source, "PortableWorkerSession.ValidateWorker(request, executable)");

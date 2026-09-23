@@ -44,10 +44,38 @@ namespace DS4Updater
         {
             RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
 
-            // Select this lifetime before parsing or constructing anything in
-            // the legacy updater. Even malformed portable requests must never
-            // fall through to its cleanup or process-termination behavior.
-            if (PortableUpdateRequest.ShouldUsePortableLifetime(e.Args, Environment.ProcessPath))
+            // Suppress legacy exit handlers until deployment is known. In
+            // particular, a stale ZIP marker in an MSI installation must not
+            // send its normal -autolaunch handoff into the portable parser.
+            portableSession = true;
+            UpdateDeployment deployment;
+            try { deployment = UpdateDeploymentPolicy.Resolve(e.Args, Environment.ProcessPath); }
+            catch (Exception error)
+            {
+                MessageBox.Show("The update could not start safely. No apps were stopped.\n\n" + error.Message,
+                    "DS4Windows update", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Shutdown(1);
+                return;
+            }
+            if (deployment == UpdateDeployment.Managed)
+            {
+                try
+                {
+                    MainWindow = new ManagedUpdateWindow(ManagedUpdateRequest.Parse(e.Args, Environment.ProcessPath));
+                    ShutdownMode = ShutdownMode.OnMainWindowClose;
+                    MainWindow.Show();
+                }
+                catch (Exception error)
+                {
+                    MessageBox.Show("The update could not start safely. No apps were stopped.\n\n" + error.Message,
+                        "DS4Windows update", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Shutdown(1);
+                }
+                return;
+            }
+            // Even malformed portable requests must never fall through to the
+            // legacy cleanup or process-termination behavior.
+            if (deployment == UpdateDeployment.Portable)
             {
                 portableSession = true;
                 try
@@ -73,6 +101,7 @@ namespace DS4Updater
                 return;
             }
 
+            portableSession = false;
             launchExePath = Path.Combine(exedirpath, "DS4Windows.exe");
             bool autoLaunch = false;
             bool forceUserLaunch = false;

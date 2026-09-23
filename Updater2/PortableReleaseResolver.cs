@@ -71,11 +71,18 @@ internal static class PortableReleaseResolver
     }
 
     internal static PortableReleaseIdentity Resolve(GitHubRelease release, string architecture, byte[] receiptBytes)
+        => ResolveCore(release, architecture, receiptBytes, RequirePackage, requireReceipt: false);
+
+    internal static PortableReleaseIdentity ResolveInstaller(GitHubRelease release, string architecture, byte[] receiptBytes)
+        => ResolveCore(release, architecture, receiptBytes, ManagedUpdateCoordinator.RequireInstaller, requireReceipt: true);
+
+    private static PortableReleaseIdentity ResolveCore(GitHubRelease release, string architecture, byte[] receiptBytes,
+        Func<GitHubRelease, string, Version, GitHubReleaseAsset> selectAsset, bool requireReceipt)
     {
         GitHubReleaseAsset receipt = SelectBuildReceipt(release);
         if (receipt is null)
         {
-            if (receiptBytes is not null ||
+            if (requireReceipt || receiptBytes is not null ||
                 !ReleaseChannelPolicy.TryGetExpectedFileVersion(release.tag_name, out Version historicalVersion))
                 throw new InvalidDataException("This named release needs a verified RELEASE-BUILD.json record.");
             GitHubReleaseAsset historicalAsset = RequirePackage(release, architecture, historicalVersion);
@@ -108,7 +115,7 @@ internal static class PortableReleaseResolver
             // constraints, never overridden by conflicting publisher metadata.
             if (ReleaseChannelPolicy.TryGetExpectedFileVersion(release.tag_name, out Version known) && known != expected)
                 throw new InvalidDataException("The build record conflicts with the release's established Windows version.");
-            GitHubReleaseAsset package = RequirePackage(release, architecture, expected);
+            GitHubReleaseAsset package = selectAsset(release, architecture, expected);
             if (!root.TryGetProperty("assets", out JsonElement assets) || assets.ValueKind != JsonValueKind.Array ||
                 assets.GetArrayLength() == 0 || assets.GetArrayLength() > MaximumReceiptAssets)
                 throw new InvalidDataException("The release build record asset list is invalid.");

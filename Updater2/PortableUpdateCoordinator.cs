@@ -168,6 +168,22 @@ internal sealed class PortableUpdateOperations : IPortableUpdateOperations, IDis
         return JsonSerializer.Deserialize<GitHubRelease>(metadata.ToArray());
     }
 
+    internal async Task<GitHubRelease> FetchPreferredReleaseAsync(bool prerelease, CancellationToken cancellation)
+    {
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellation);
+        deadline.CancelAfter(transferTimeout < TimeSpan.FromSeconds(45) ? transferTimeout : TimeSpan.FromSeconds(45));
+        cancellation = deadline.Token;
+        using HttpResponseMessage response = await client.GetAsync(
+            "https://api.github.com/repos/hbashton/DS4Windows/releases?per_page=100",
+            HttpCompletionOption.ResponseHeadersRead, cancellation).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        using Stream input = await response.Content.ReadAsStreamAsync(cancellation).ConfigureAwait(false);
+        using var metadata = new MemoryStream();
+        await CopyBoundedAsync(input, metadata, 4 * 1024 * 1024, null, cancellation).ConfigureAwait(false);
+        return ReleaseChannelPolicy.SelectPreferredRelease(
+            JsonSerializer.Deserialize<GitHubRelease[]>(metadata.ToArray()), prerelease);
+    }
+
     public async Task<string> DownloadAsync(GitHubReleaseAsset asset, CancellationToken cancellation)
     {
         // ResponseHeadersRead transfers body ownership to this method: the

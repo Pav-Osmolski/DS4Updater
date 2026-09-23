@@ -22,27 +22,8 @@ internal sealed record PortableUpdateRequest(string TargetDirectory, int ParentP
     internal static bool IsPortableInvocation(string[] args) => args.Any(a =>
         a.StartsWith("--portable-", StringComparison.OrdinalIgnoreCase));
 
-    internal static bool ShouldUsePortableLifetime(string[] args, string executablePath)
-    {
-        if (IsPortableInvocation(args)) return true;
-        if (string.IsNullOrEmpty(executablePath)) return false;
-        string folder = Path.GetDirectoryName(Path.GetFullPath(executablePath));
-        string name = Path.GetFileName(folder);
-        // Double-clicking a portable updater (or its retained worker) must not
-        // accidentally enter the legacy name-based stop/delete lifecycle.
-        return HasPortableMarker(Path.Combine(folder, PortableUpdateProcessGuard.MarkerFileName)) ||
-            (name.StartsWith("portable-worker-", StringComparison.Ordinal) &&
-                Guid.TryParseExact(name[16..], "N", out _));
-    }
-
-    private static bool HasPortableMarker(string path)
-    {
-        try { _ = File.GetAttributes(path); return true; }
-        catch (FileNotFoundException) { return false; }
-        catch (DirectoryNotFoundException) { return false; }
-        catch (IOException) { return true; }
-        catch (UnauthorizedAccessException) { return true; }
-    }
+    internal static bool ShouldUsePortableLifetime(string[] args, string executablePath) =>
+        UpdateDeploymentPolicy.Resolve(args, executablePath) == UpdateDeployment.Portable;
 
     internal static PortableUpdateRequest Parse(string[] args, string executablePath)
     {
