@@ -117,7 +117,7 @@ internal sealed class PortableUpdateOperations : IPortableUpdateOperations, IDis
             throw new ArgumentOutOfRangeException(nameof(transferTimeout));
         client = new HttpClient(handler ?? new HttpClientHandler { AllowAutoRedirect = false })
             { Timeout = TimeSpan.FromSeconds(45) };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("DS4Windows-Portable-Updater/2.0.7");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("DS4Windows-Portable-Updater/2.0.8");
         client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
     }
 
