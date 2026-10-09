@@ -4,6 +4,17 @@ The companion updater for [Pav-Osmolski/DS4Windows](https://github.com/Pav-Osmol
 This fork continues the work of [hbashton/DS4Updater](https://github.com/hbashton/DS4Updater)
 and earlier contributors.
 
+## Download and use
+
+DS4Windows downloads and launches its matching updater when an update is needed.
+For manual app downloads, use the [DS4Windows releases page](https://github.com/Pav-Osmolski/DS4Windows/releases).
+Updater releases will be available on the [DS4Updater releases page](https://github.com/Pav-Osmolski/DS4Updater/releases).
+Choose `DS4Updater.exe` for x64 or `DS4Updater_x86.exe` for x86 when a manual updater download is required.
+
+**Release status:** Fork update support is being prepared for **2.0.9**; it has
+not been released yet. Until the coordinated app and updater releases are
+available, download DS4Windows updates manually from this fork.
+
 ## Fork update support
 
 Version **2.0.9** targets this fork's DS4Windows releases. It validates download
