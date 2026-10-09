@@ -159,7 +159,7 @@ internal sealed class PortableUpdateOperations : IPortableUpdateOperations, IDis
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellation);
         deadline.CancelAfter(transferTimeout < TimeSpan.FromSeconds(45) ? transferTimeout : TimeSpan.FromSeconds(45));
         cancellation = deadline.Token;
-        var uri = new Uri("https://api.github.com/repos/hbashton/DS4Windows/releases/tags/" + Uri.EscapeDataString(exactTag));
+        var uri = new Uri("https://api.github.com/repos/Pav-Osmolski/DS4Windows/releases/tags/" + Uri.EscapeDataString(exactTag));
         using HttpResponseMessage response = await client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancellation).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         using Stream input = await response.Content.ReadAsStreamAsync(cancellation).ConfigureAwait(false);
@@ -174,7 +174,7 @@ internal sealed class PortableUpdateOperations : IPortableUpdateOperations, IDis
         deadline.CancelAfter(transferTimeout < TimeSpan.FromSeconds(45) ? transferTimeout : TimeSpan.FromSeconds(45));
         cancellation = deadline.Token;
         using HttpResponseMessage response = await client.GetAsync(
-            "https://api.github.com/repos/hbashton/DS4Windows/releases?per_page=100",
+            "https://api.github.com/repos/Pav-Osmolski/DS4Windows/releases?per_page=100",
             HttpCompletionOption.ResponseHeadersRead, cancellation).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         using Stream input = await response.Content.ReadAsStreamAsync(cancellation).ConfigureAwait(false);

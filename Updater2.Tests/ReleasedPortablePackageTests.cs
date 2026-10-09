@@ -10,6 +10,23 @@ public sealed class ReleasedPortablePackageTests
 {
     [TestMethod]
     [TestCategory("ReleasedPackage")]
+    public void ActualForkRc467ArchivePreservesProfilesCustomNamesAndLangLayout()
+    {
+        string archive = Environment.GetEnvironmentVariable("DS4UPDATER_RC467_PACKAGE");
+        if (string.IsNullOrWhiteSpace(archive))
+            Assert.Inconclusive("Opt in with DS4UPDATER_RC467_PACKAGE pointing to this fork's RC4.6.7 portable ZIP.");
+        using (var zip = ZipFile.OpenRead(archive))
+        {
+            Assert.IsNotNull(zip.GetEntry("DS4Windows/Lang/de/DS4Windows.resources.dll"));
+            Assert.IsNull(zip.GetEntry("DS4Windows/de/DS4Windows.resources.dll"));
+        }
+        VerifyCustomTransactions(archive,
+            "F37E860A84F3A08D7FDAD6FD2D1C4D694F0344AEDF8634FDEDF6C350B54A3087",
+            "VIIPERRC4.6.7", "5.0.12.0", null);
+    }
+
+    [TestMethod]
+    [TestCategory("ReleasedPackage")]
     public void ActualRc461ArchiveKeepsCustomApphostsAcrossUpdatesAndNameChanges()
     {
         string archive = Environment.GetEnvironmentVariable("DS4UPDATER_RC461_PACKAGE");

@@ -42,8 +42,8 @@ namespace DS4Updater
     public partial class MainWindow : Window
     {
         private const string CUSTOM_EXE_CONFIG_FILENAME = "custom_exe_name.txt";
-        private const string DS4WINDOWS_RELEASES_API_URI = "https://api.github.com/repos/hbashton/DS4Windows/releases";
-        private const string DS4WINDOWS_RELEASE_DOWNLOAD_BASE_URI = "https://github.com/hbashton/DS4Windows/releases/download";
+        private const string DS4WINDOWS_RELEASES_API_URI = "https://api.github.com/repos/Pav-Osmolski/DS4Windows/releases";
+        private const string DS4WINDOWS_RELEASE_DOWNLOAD_BASE_URI = "https://github.com/Pav-Osmolski/DS4Windows/releases/download";
         //WebClient wc = new WebClient(), subwc = new WebClient();
         private HttpClient wc = new HttpClient();
         protected string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),

@@ -105,7 +105,7 @@ internal static class PortableReleaseResolver
             RejectDuplicateProperties(root);
             if (root.ValueKind != JsonValueKind.Object ||
                 !root.TryGetProperty("schema", out JsonElement schema) || !schema.TryGetInt32(out int schemaNumber) || schemaNumber != 1 ||
-                RequiredString(root, "repository") != "hbashton/DS4Windows" ||
+                RequiredString(root, "repository") != "Pav-Osmolski/DS4Windows" ||
                 RequiredString(root, "tag") != release.tag_name ||
                 release.id.GetValueOrDefault() <= 0 || ReadReleaseId(root) != release.id ||
                 !TryReadPeVersion(RequiredString(root, "binaryVersion"), release.tag_name, out Version expected))

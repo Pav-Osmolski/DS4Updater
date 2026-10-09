@@ -44,6 +44,16 @@ jobs:
           }
           "DS4UPDATER_RC461_PACKAGE=$archive" >> $env:GITHUB_ENV
 
+      - name: Download immutable fork RC4.6.7 fixture
+        shell: pwsh
+        run: |
+          $archive = Join-Path $env:RUNNER_TEMP 'DS4Windows-RC4.6.7-x64.zip'
+          Invoke-WebRequest 'https://github.com/Pav-Osmolski/DS4Windows/releases/download/VIIPERRC4.6.7/DS4Windows_VIIPER_x64.zip' -OutFile $archive
+          if ((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash -ne 'F37E860A84F3A08D7FDAD6FD2D1C4D694F0344AEDF8634FDEDF6C350B54A3087') {
+            throw 'The immutable fork RC4.6.7 fixture does not match its pinned SHA-256.'
+          }
+          "DS4UPDATER_RC467_PACKAGE=$archive" >> $env:GITHUB_ENV
+
       - name: Test release selection and safe portable update
         run: dotnet test .\Updater2.Tests\DS4Updater.Tests.csproj -c Release
 

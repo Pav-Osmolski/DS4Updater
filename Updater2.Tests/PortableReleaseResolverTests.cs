@@ -174,7 +174,8 @@ public sealed class PortableReleaseResolverTests
     [DataTestMethod]
     [DataRow("schema", "1")]
     [DataRow("repository", "other/DS4Windows")]
-    [DataRow("repository", "hbashton/ds4windows")]
+    [DataRow("repository", "hbashton/DS4Windows")]
+    [DataRow("repository", "Pav-Osmolski/ds4windows")]
     [DataRow("tag", "VIIPERRC4.5.2")]
     [DataRow("tag", "viiperrc4.6")]
     [DataRow("releaseId", "12346")]
@@ -304,7 +305,7 @@ public sealed class PortableReleaseResolverTests
         // workflow-produced string release/run IDs. All bytes remain synthetic.
         var root = new Dictionary<string, object>
         {
-            ["schema"] = 1, ["repository"] = "hbashton/DS4Windows", ["tag"] = tag,
+            ["schema"] = 1, ["repository"] = "Pav-Osmolski/DS4Windows", ["tag"] = tag,
             ["releaseId"] = ReleaseId.ToString(System.Globalization.CultureInfo.InvariantCulture),
             ["sourceCommit"] = new string('b', 40), ["runId"] = "67890", ["unsignedRc"] = true,
             ["binaryVersion"] = version, ["brokerSourceName"] = "VIIPER-0.1.3-rc4.5-SOURCE.zip",
@@ -331,7 +332,7 @@ public sealed class PortableReleaseResolverTests
             DateTimeOffset.Parse("2026-09-09T00:00:00Z"), DateTimeOffset.Parse("2026-09-08T00:00:00Z"), assets, id: ReleaseId);
 
     private static GitHubReleaseAsset Asset(string tag, string name, long size, string hash) =>
-        new(name, "https://github.com/hbashton/DS4Windows/releases/download/" +
+        new(name, "https://github.com/Pav-Osmolski/DS4Windows/releases/download/" +
             Uri.EscapeDataString(tag) + "/" + Uri.EscapeDataString(name), size, "sha256:" + hash);
 
     private sealed record Fixture(GitHubRelease Release, byte[] Bytes);

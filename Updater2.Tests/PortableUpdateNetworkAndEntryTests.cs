@@ -157,7 +157,7 @@ public sealed class PortableUpdateNetworkAndEntryTests
     }
 
     private static GitHubReleaseAsset Asset(long size) => new("DS4Windows_VIIPER_x64.zip",
-        "https://github.com/hbashton/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip",
+        "https://github.com/Pav-Osmolski/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip",
         size, "sha256:" + new string('a', 64));
 
     private static (PortableUpdateRequest Request, PortableWorkerRecord Record, string Executable) CreateWorker(string target)

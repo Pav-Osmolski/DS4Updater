@@ -223,7 +223,7 @@ namespace DS4Updater
                 string.Equals(uri.Host, "github.com", StringComparison.OrdinalIgnoreCase) &&
                 uri.UserInfo.Length == 0 && uri.Query.Length == 0 && uri.Fragment.Length == 0 &&
                 string.Equals(uri.AbsolutePath,
-                    "/hbashton/DS4Windows/releases/download/" + Uri.EscapeDataString(tag) +
+                    "/Pav-Osmolski/DS4Windows/releases/download/" + Uri.EscapeDataString(tag) +
                     "/" + Uri.EscapeDataString(asset.name), StringComparison.Ordinal);
         }
 

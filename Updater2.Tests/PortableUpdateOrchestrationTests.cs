@@ -360,7 +360,7 @@ public sealed class PortableUpdateOrchestrationTests
         internal PortableInstalledIdentity Staged = new("5.0.5.0", "VIIPERRC4.5", "VIIPERRC4.5");
         internal GitHubRelease Release = new("VIIPERRC4.5", true, false, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow,
             new[] { new GitHubReleaseAsset("DS4Windows_VIIPER_x64.zip",
-                "https://github.com/hbashton/DS4Windows/releases/download/VIIPERRC4.5/DS4Windows_VIIPER_x64.zip", 100,
+                "https://github.com/Pav-Osmolski/DS4Windows/releases/download/VIIPERRC4.5/DS4Windows_VIIPER_x64.zip", 100,
                 "sha256:" + new string('a', 64)) });
         internal bool Applied;
         internal string AppliedAlias;
@@ -378,16 +378,16 @@ public sealed class PortableUpdateOrchestrationTests
             const long releaseId = 123;
             var zip = Release.assets[0] with
             {
-                browser_download_url = $"https://github.com/hbashton/DS4Windows/releases/download/{tag}/DS4Windows_VIIPER_x64.zip",
+                browser_download_url = $"https://github.com/Pav-Osmolski/DS4Windows/releases/download/{tag}/DS4Windows_VIIPER_x64.zip",
             };
             ReceiptBytes = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(new
             {
-                schema = 1, repository = "hbashton/DS4Windows", tag, releaseId,
+                schema = 1, repository = "Pav-Osmolski/DS4Windows", tag, releaseId,
                 binaryVersion = version,
                 assets = new[] { new { name = zip.name, sha256 = new string('a', 64) } },
             });
             var receipt = new GitHubReleaseAsset(PortableReleaseResolver.ReceiptName,
-                $"https://github.com/hbashton/DS4Windows/releases/download/{tag}/{PortableReleaseResolver.ReceiptName}",
+                $"https://github.com/Pav-Osmolski/DS4Windows/releases/download/{tag}/{PortableReleaseResolver.ReceiptName}",
                 ReceiptBytes.Length, "sha256:" + Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReceiptBytes)));
             Release = Release with { tag_name = tag, prerelease = ReleaseChannelPolicy.IsPrereleaseBuild(tag),
                 id = releaseId, assets = new[] { zip, receipt } };
