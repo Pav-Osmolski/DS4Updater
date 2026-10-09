@@ -8,12 +8,13 @@ and earlier contributors.
 
 DS4Windows downloads and launches its matching updater when an update is needed.
 For manual app downloads, use the [DS4Windows releases page](https://github.com/Pav-Osmolski/DS4Windows/releases).
-Updater releases will be available on the [DS4Updater releases page](https://github.com/Pav-Osmolski/DS4Updater/releases).
+Updater releases are available on the [DS4Updater releases page](https://github.com/Pav-Osmolski/DS4Updater/releases).
 Choose `DS4Updater.exe` for x64 or `DS4Updater_x86.exe` for x86 when a manual updater download is required.
 
-**Release status:** Fork update support is being prepared for **2.0.9**; it has
-not been released yet. Until the coordinated app and updater releases are
-available, download DS4Windows updates manually from this fork.
+**Release status:** [DS4Updater 2.0.9](https://github.com/Pav-Osmolski/DS4Updater/releases/tag/v2.0.9)
+is available with verified x64 and x86 downloads. The matching DS4Windows
+RC4.6.8 change is being tested. RC4.6.7 users still need to download the first
+DS4Windows build containing that change manually.
 
 ## Fork update support
 
