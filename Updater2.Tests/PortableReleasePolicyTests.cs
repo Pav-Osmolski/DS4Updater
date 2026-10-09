@@ -126,15 +126,16 @@ public sealed class PortableReleasePolicyTests
     }
 
     [DataTestMethod]
-    [DataRow("http://github.com/hbashton/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip")]
-    [DataRow("https://github.com.evil.example/hbashton/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip")]
+    [DataRow("http://github.com/Pav-Osmolski/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip")]
+    [DataRow("https://github.com.evil.example/Pav-Osmolski/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip")]
     [DataRow("https://github.com/other/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip")]
-    [DataRow("https://github.com/hbashton/DS4Windows/releases/download/VIIPERRC4.5/DS4Windows_VIIPER_x64.zip")]
-    [DataRow("https://github.com/hbashton/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x86.zip")]
-    [DataRow("https://github.com/hbashton/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip?other=1")]
-    [DataRow("https://github.com/hbashton/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip#other")]
-    [DataRow("https://user@github.com/hbashton/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip")]
-    [DataRow("https://github.com:8443/hbashton/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip")]
+    [DataRow("https://github.com/hbashton/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip")]
+    [DataRow("https://github.com/Pav-Osmolski/DS4Windows/releases/download/VIIPERRC4.5/DS4Windows_VIIPER_x64.zip")]
+    [DataRow("https://github.com/Pav-Osmolski/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x86.zip")]
+    [DataRow("https://github.com/Pav-Osmolski/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip?other=1")]
+    [DataRow("https://github.com/Pav-Osmolski/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip#other")]
+    [DataRow("https://user@github.com/Pav-Osmolski/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip")]
+    [DataRow("https://github.com:8443/Pav-Osmolski/DS4Windows/releases/download/VIIPERRC4.5.1/DS4Windows_VIIPER_x64.zip")]
     [DataRow("file:///C:/DS4Windows_VIIPER_x64.zip")]
     [DataRow("not a URI")]
     [DataRow(null)]
@@ -185,5 +186,5 @@ public sealed class PortableReleasePolicyTests
             DateTimeOffset.Parse("2026-09-09T00:00:00Z"), null, assets ?? Array.Empty<GitHubReleaseAsset>());
 
     private static GitHubReleaseAsset Asset(string name = Name, string tag = Tag) =>
-        new(name, $"https://github.com/hbashton/DS4Windows/releases/download/{tag}/{name}", 12345, "sha256:" + Hash);
+        new(name, $"https://github.com/Pav-Osmolski/DS4Windows/releases/download/{tag}/{name}", 12345, "sha256:" + Hash);
 }

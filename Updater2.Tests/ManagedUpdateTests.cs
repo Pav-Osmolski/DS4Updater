@@ -250,10 +250,10 @@ public sealed class ManagedUpdateTests
     {
         image ??= PeImage();
         string hash = Convert.ToHexString(SHA256.HashData(image));
-        byte[] receipt = JsonSerializer.SerializeToUtf8Bytes(new { schema = 1, repository = "hbashton/DS4Windows", tag = Tag,
+        byte[] receipt = JsonSerializer.SerializeToUtf8Bytes(new { schema = 1, repository = "Pav-Osmolski/DS4Windows", tag = Tag,
             releaseId = 100, binaryVersion = Version, assets = new[] { new { name = Installer, sha256 = hash } } });
         GitHubReleaseAsset Asset(string name, byte[] bytes) => new(name,
-            $"https://github.com/hbashton/DS4Windows/releases/download/{Tag}/{name}", bytes.Length,
+            $"https://github.com/Pav-Osmolski/DS4Windows/releases/download/{Tag}/{name}", bytes.Length,
             "sha256:" + Convert.ToHexString(SHA256.HashData(bytes)));
         return new(new GitHubRelease(Tag, true, false, DateTimeOffset.UtcNow, null,
             new[] { Asset(Installer, image), Asset("RELEASE-BUILD.json", receipt) }, 100), receipt, image);
