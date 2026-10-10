@@ -1,5 +1,8 @@
 # Portable updater 2.0.5 — local validation, 2026-09-09
 
+> **Historical record.** This preserves the source, tests and limitations recorded at the time; it is not current setup guidance. See the [documentation index](README.md).
+
+
 This is a source/build checkpoint, not a publication record. The public updater
 was still 2.0.4 when checked during this work. No installed DS4Windows, VIIPER,
 controller session, or real user portable directory was updated by these tests.

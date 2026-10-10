@@ -1,52 +1,25 @@
 # DS4Updater
 
-The companion updater for [Pav-Osmolski/DS4Windows](https://github.com/Pav-Osmolski/DS4Windows).
-This fork continues the work of [hbashton/DS4Updater](https://github.com/hbashton/DS4Updater)
-and earlier contributors.
+The companion updater for [Pav-Osmolski/DS4Windows](https://github.com/Pav-Osmolski/DS4Windows),
+continuing [hbashton's updater](https://github.com/hbashton/DS4Updater) and earlier contributors.
 
-## Download and use
+## Use
 
-DS4Windows downloads and launches its matching updater when an update is needed.
-For manual app downloads, use the [DS4Windows releases page](https://github.com/Pav-Osmolski/DS4Windows/releases).
-Updater releases are available on the [DS4Updater releases page](https://github.com/Pav-Osmolski/DS4Updater/releases).
-Choose `DS4Updater.exe` for x64 or `DS4Updater_x86.exe` for x86 when a manual updater download is required.
+DS4Windows downloads and launches its matching updater when needed. For manual
+app updates, download from [DS4Windows Releases](https://github.com/Pav-Osmolski/DS4Windows/releases).
+Standalone updater downloads are on [DS4Updater Releases](https://github.com/Pav-Osmolski/DS4Updater/releases):
+`DS4Updater.exe` for x64 and `DS4Updater_x86.exe` for x86. The current DS4Windows
+VIIPER packages require Windows x64; an x86 updater does not add x86 app support.
 
-**Release status:** [DS4Updater 2.0.9](https://github.com/Pav-Osmolski/DS4Updater/releases/tag/v2.0.9)
-is available with verified x64 and x86 downloads. The matching DS4Windows
-RC4.6.8 change is being tested. RC4.6.7 users still need to download the first
-DS4Windows build containing that change manually.
+The updater supports installed and portable updates, preserving profiles and
+custom portable executable names while checking package identity, size and hashes.
+RC4.6.7 users need one manual app upgrade because that app still checks upstream.
+Replacing the updater alone cannot change the old app's release source.
 
-## Fork update support
+## Contribute
 
-Version **2.0.9** targets this fork's DS4Windows releases. It validates download
-URLs and build receipts against `Pav-Osmolski/DS4Windows`, retaining SHA-256,
-size, release identity, and package ownership checks. It supports both managed
-installer updates and transactional portable updates that preserve profiles,
-custom executable names, and the `Lang` translation layout.
-
-DS4Windows also needs the corresponding update-source change. The already
-published RC4.6.7 still checks upstream: updating DS4Updater alone cannot
-change that release's update checks. Install the first DS4Windows release
-containing the fork update-source change manually.
-
-## Build and test
-
-Use Windows and the .NET 8 SDK:
-
-```powershell
-dotnet test .\Updater2.Tests\DS4Updater.Tests.csproj -c Release
-dotnet publish .\Updater2\DS4Updater.csproj -c Release -r win-x64 --self-contained true /p:Platform=x64 /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:EnableCompressionInSingleFile=true
-```
-
-Real-package tests run in GitHub Actions with pinned historical upstream
-fixtures and this fork's RC4.6.7 package. Those upstream fixtures are test data,
-not update sources. Build artifacts include `DS4Updater.exe` for x64 and
-`DS4Updater_x86.exe` for x86.
-
-## Release coordination
-
-Publish `v2.0.9` with both verified executable assets before releasing the
-DS4Windows update-source change, which requires updater 2.0.9 or newer. Do not
-replace assets on an existing upstream version or change DS4Windows RC4.6.7.
+See [Documentation](docs/README.md) for build, test and compatibility details,
+[CHANGELOG.md](CHANGELOG.md) for release history, and
+[Issues](https://github.com/Pav-Osmolski/DS4Updater/issues) to report updater bugs.
 
 Licensed under GPL-3.0. See [COPYING](COPYING).
