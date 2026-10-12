@@ -1,5 +1,8 @@
 # DS4Windows #99 — custom portable executable updates
 
+> **Historical record.** This preserves the source, tests and limitations recorded at the time; it is not current setup guidance. See the [documentation index](README.md).
+
+
 Source fix for [DS4Windows issue #99](https://github.com/hbashton/DS4Windows/issues/99).
 This fix is prepared for updater **2.0.7**; publication is coordinated separately.
 
