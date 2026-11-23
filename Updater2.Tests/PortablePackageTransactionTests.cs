@@ -750,17 +750,20 @@ public sealed class PortablePackageTransactionTests
     [TestMethod]
     public void ReparseTargetAndStagingComponentsAreRejected()
     {
+        const int privilegeNotHeld = unchecked((int)0x80070522);
         using var f = new Fixture();
         string link = Path.Combine(f.Root, "linked-app");
         try { Directory.CreateSymbolicLink(link, f.Target); }
-        catch (UnauthorizedAccessException) { Assert.Inconclusive("This runner cannot create an isolated filesystem link."); }
+        catch (Exception error) when (error is UnauthorizedAccessException || error.HResult == privilegeNotHeld)
+        { Assert.Inconclusive("This runner cannot create an isolated filesystem link."); }
         try { Assert.ThrowsException<IOException>(() => PortablePackageTransaction.ValidateTargetRoot(link)); }
         finally { if (Directory.Exists(link)) Directory.Delete(link); }
         using var plan = f.Prepare();
         string stage = Path.Combine(plan.StagedRoot, "DS4Windows.dll");
         File.Delete(stage);
         try { File.CreateSymbolicLink(stage, Path.Combine(f.Target, "DS4Windows.dll")); }
-        catch (UnauthorizedAccessException) { Assert.Inconclusive("This runner cannot create an isolated file link."); }
+        catch (Exception error) when (error is UnauthorizedAccessException || error.HResult == privilegeNotHeld)
+        { Assert.Inconclusive("This runner cannot create an isolated file link."); }
         try { Assert.ThrowsException<IOException>(() => plan.Apply()); }
         finally { File.Delete(stage); }
     }
@@ -770,6 +773,69 @@ public sealed class PortablePackageTransactionTests
     {
         CollectionAssert.AreEquivalent(expected.Keys.ToArray(), actual.Keys.ToArray());
         foreach (var item in expected) Assert.AreEqual(item.Value, actual[item.Key], item.Key);
+    }
+
+    [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void MigratesFlatPackageAndKeepsTheSelectedExecutable(bool custom)
+    {
+        using var f = new Fixture();
+        const string alias = "Game.Pad";
+        string exe = custom ? alias + ".exe" : "DS4Windows.exe";
+        if (custom)
+        {
+            f.CreateLegacyAlias(alias);
+            f.OwnOldFile(alias + ".deps.json", "previous managed sidecar");
+            f.OwnOldFile(alias + ".runtimeconfig.json", "previous managed sidecar");
+        }
+        f.WriteUser("Profiles/Existing.xml", "profile");
+        f.UseSplitPayload();
+        using var transaction = f.Prepare();
+        transaction.Apply(custom ? alias : null, exe);
+
+        Assert.IsTrue(File.Exists(Path.Combine(f.Target, exe)));
+        Assert.AreEqual(!custom, File.Exists(Path.Combine(f.Target, "DS4Windows.exe")));
+        foreach (string name in new[] { "DS4Windows.dll", "DS4Windows.runtimeconfig.json", "DS4Windows.deps.json" })
+        {
+            Assert.IsFalse(File.Exists(Path.Combine(f.Target, name)));
+            CollectionAssert.AreEqual(f.Payload["Runtime/" + name], File.ReadAllBytes(Path.Combine(f.Target, "Runtime", name)));
+        }
+        Assert.IsFalse(File.Exists(Path.Combine(f.Target, alias + ".deps.json")));
+        Assert.IsFalse(File.Exists(Path.Combine(f.Target, alias + ".runtimeconfig.json")));
+        Assert.AreEqual("profile", File.ReadAllText(Path.Combine(f.Target, "Profiles/Existing.xml")));
+    }
+
+    [TestMethod]
+    public void MixedOrIncompleteRuntimePackageIsRejectedBeforeStaging()
+    {
+        using var f = new Fixture();
+        f.UseSplitPayload();
+        f.Payload["DS4Windows.dll"] = f.Payload["Runtime/DS4Windows.dll"];
+        f.BuildArchive();
+        Assert.ThrowsException<InvalidDataException>(() => f.Prepare());
+
+        f.Payload.Remove("DS4Windows.dll");
+        f.Payload.Remove("Runtime/DS4Windows.deps.json");
+        f.BuildArchive();
+        Assert.ThrowsException<InvalidDataException>(() => f.Prepare());
+        Assert.IsFalse(Directory.Exists(Path.Combine(f.Target, "Updates")));
+    }
+
+    [TestMethod]
+    public void FailedSplitUpgradeRestoresTheFlatApplication()
+    {
+        using var f = new Fixture();
+        f.UseSplitPayload();
+        var before = f.LiveSnapshot();
+        using var transaction = f.Prepare();
+        transaction.BeforeMutationForTesting = (name, rollback) =>
+        {
+            if (!rollback && name == "Runtime/DS4Windows.dll")
+                throw new IOException("injected split upgrade failure");
+        };
+        Assert.ThrowsException<IOException>(() => transaction.Apply());
+        CollectionAssert.AreEquivalent(before.ToArray(), f.LiveSnapshot().ToArray());
     }
 
     private sealed class Fixture : IDisposable
@@ -837,6 +903,16 @@ public sealed class PortablePackageTransactionTests
         }
         private void WriteOldManifest() => File.WriteAllText(Path.Combine(Target, PortablePackageTransaction.ManifestName),
             string.Join("\n", oldOwnership.Order()) + "\n");
+        internal void UseSplitPayload()
+        {
+            foreach (string name in new[] { "DS4Windows.dll", "DS4Windows.runtimeconfig.json", "DS4Windows.deps.json" })
+            {
+                Payload.Add("Runtime/" + name, Payload[name]);
+                Payload.Remove(name);
+            }
+            BuildArchive();
+        }
+
         internal string ManifestText() => string.Join("\n", Payload.Keys.Order()) + "\n";
         internal void BuildArchive(string manifest = null, string extraRawPath = null, int externalAttributes = 0)
         {

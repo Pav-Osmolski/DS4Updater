@@ -2,6 +2,13 @@
 
 Release history for the Pav-Osmolski DS4Updater fork.
 
+## Unreleased
+
+## [2.0.10](https://github.com/Pav-Osmolski/DS4Updater/releases/tag/v2.0.10)
+
+- Support portable and installed DS4Windows builds that keep their DLL and .NET configuration files under `Runtime`. Existing flat packages remain supported.
+- Preserve custom portable executable names across the transition and remove obsolete files owned by the old package.
+
 ## [2.0.9](https://github.com/Pav-Osmolski/DS4Updater/releases/tag/v2.0.9)
 
 - Target Pav-Osmolski/DS4Windows releases and validate their download URLs and build receipts.

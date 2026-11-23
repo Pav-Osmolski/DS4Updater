@@ -117,7 +117,7 @@ internal sealed class PortableUpdateOperations : IPortableUpdateOperations, IDis
             throw new ArgumentOutOfRangeException(nameof(transferTimeout));
         client = new HttpClient(handler ?? new HttpClientHandler { AllowAutoRedirect = false })
             { Timeout = TimeSpan.FromSeconds(45) };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("DS4Windows-Portable-Updater/2.0.8");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("DS4Windows-Portable-Updater/2.0.10");
         client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
     }
 
@@ -128,7 +128,7 @@ internal sealed class PortableUpdateOperations : IPortableUpdateOperations, IDis
     internal static PortableInstalledIdentity ReadInstalledIdentity(string root, string launchExe)
     {
         string executable = Path.Combine(root, launchExe);
-        string assembly = Path.Combine(root, "DS4Windows.dll");
+        string assembly = Path.Combine(root, PortableApplicationFiles.GetInstalledAssemblyRelativePath(root));
         string marker = Path.Combine(root, "DS4Windows.release");
         foreach (string path in new[] { executable, assembly, marker }) PortablePackageTransaction.ValidateNoReparse(path);
         if (!File.Exists(executable) || !File.Exists(assembly))

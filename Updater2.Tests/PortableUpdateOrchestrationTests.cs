@@ -7,8 +7,10 @@ namespace DS4Updater.Tests;
 [TestClass]
 public sealed class PortableUpdateOrchestrationTests
 {
-    [TestMethod]
-    public void InstalledAndDeeplyStagedIdentitiesRetainExactPeVersionsPastMaxPath()
+    [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void InstalledAndDeeplyStagedIdentitiesRetainExactPeVersionsPastMaxPath(bool split)
     {
         string root = Path.Combine(Path.GetTempPath(), "updater-version-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
@@ -21,8 +23,16 @@ public sealed class PortableUpdateOrchestrationTests
                 Path.Combine(root, new string('a', 100), new string('b', 100), new string('c', 50)) })
             {
                 Directory.CreateDirectory(location);
-                foreach (string name in new[] { "DS4Windows.exe", "DS4Windows.dll", "CustomPad.exe" })
+                foreach (string name in new[] { "DS4Windows.exe", "CustomPad.exe" })
                     File.Copy(image, Path.Combine(location, name)); // Version-bearing fixture only; never executed.
+                string assemblyDirectory = split ? Path.Combine(location, "Runtime") : location;
+                Directory.CreateDirectory(assemblyDirectory);
+                File.Copy(image, Path.Combine(assemblyDirectory, "DS4Windows.dll"));
+                if (split)
+                {
+                    File.WriteAllText(Path.Combine(assemblyDirectory, "DS4Windows.deps.json"), "{}");
+                    File.WriteAllText(Path.Combine(assemblyDirectory, "DS4Windows.runtimeconfig.json"), "{}");
+                }
                 File.WriteAllText(Path.Combine(location, "DS4Windows.release"), "VIIPERRC4.5.1\n");
                 foreach (string executable in new[] { "DS4Windows.exe", "CustomPad.exe" })
                 {

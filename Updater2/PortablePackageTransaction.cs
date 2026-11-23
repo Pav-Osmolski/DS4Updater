@@ -26,6 +26,7 @@ internal sealed class PortablePackageTransaction : IDisposable
     private readonly Dictionary<string, string> payloadHashes = new(Paths);
     private readonly HashSet<string> previousOwnership;
     private readonly string previousManifestHash;
+    private readonly bool splitPackage;
     private readonly FileStream transactionLock;
     private readonly List<string> createdDirectories = new();
     private string state = "prepared";
@@ -40,7 +41,7 @@ internal sealed class PortablePackageTransaction : IDisposable
     internal Action AfterLegacyAdoptionSnapshotForTesting { get; set; }
 
     private PortablePackageTransaction(string target, string transaction, FileStream owner,
-        HashSet<string> previous, string previousHash)
+        HashSet<string> previous, string previousHash, bool splitPackage)
     {
         TargetRoot = target;
         TransactionRoot = transaction;
@@ -48,6 +49,7 @@ internal sealed class PortablePackageTransaction : IDisposable
         transactionLock = owner;
         previousOwnership = previous;
         previousManifestHash = previousHash;
+        this.splitPackage = splitPackage;
     }
 
     internal static PortablePackageTransaction Prepare(string targetRoot, string archivePath,
@@ -78,10 +80,10 @@ internal sealed class PortablePackageTransaction : IDisposable
         foreach (string path in incoming)
             if (!string.Equals(files[path].FullName, "DS4Windows/" + path, StringComparison.Ordinal))
                 throw new InvalidDataException("Manifest path casing does not match its archive entry.");
-        foreach (string required in new[] { "DS4Windows.exe", "DS4Windows.dll",
-                     "DS4Windows.runtimeconfig.json", "DS4Windows.deps.json", "DS4Windows.release",
+        foreach (string required in new[] { "DS4Windows.exe", "DS4Windows.release",
                      MarkerName, "viiper.exe", "viiper.exe.sha256" })
             if (!incoming.Contains(required)) throw new InvalidDataException("Required package file is missing: " + required);
+        bool splitPackage = PortableApplicationFiles.UsesSplitPackage(incoming);
         if (ReadEntryText(files[MarkerName], 128).TrimEnd('\r', '\n') != MarkerText ||
             ReadEntryText(files["DS4Windows.release"], 256).TrimEnd('\r', '\n') != expectedTag)
             throw new InvalidDataException("The portable marker or release identity is incorrect.");
@@ -105,7 +107,7 @@ internal sealed class PortablePackageTransaction : IDisposable
                 throw new IOException("An earlier portable update requires inspection. Preserve its recovery folder in Updates.");
             string transaction = Path.Combine(updates, TransactionPrefix + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(transaction);
-            plan = new PortablePackageTransaction(target, transaction, owner, previous, oldHash);
+            plan = new PortablePackageTransaction(target, transaction, owner, previous, oldHash, splitPackage);
             Directory.CreateDirectory(plan.StagedRoot);
             plan.WriteJournal("staging", Array.Empty<Change>());
             foreach (var entry in files)
@@ -310,7 +312,8 @@ internal sealed class PortablePackageTransaction : IDisposable
         var pins = new Dictionary<string, FileStream>(Paths);
         try
         {
-            string[] evidence = unowned.Append(installedExe).Append("DS4Windows.dll")
+            string assembly = PortableApplicationFiles.GetInstalledAssemblyRelativePath(TargetRoot);
+            string[] evidence = unowned.Append(installedExe).Append(assembly)
                 .Concat(unowned.Where(path => !Paths.Equals(path, installedExe))
                     .Select(path => "DS4Windows" + path.Substring(name.Length)))
                 .Distinct(Paths).ToArray();
@@ -347,7 +350,8 @@ internal sealed class PortablePackageTransaction : IDisposable
         try { PortableUpdateProcessGuard.ValidateCustomExeName(name + ".exe"); }
         catch (ArgumentException error) { throw new InvalidDataException("The custom executable name is unsafe.", error); }
         if (Paths.Equals(name, "DS4Windows")) return aliases;
-        foreach (string suffix in new[] { ".exe", ".runtimeconfig.json", ".deps.json" })
+        string[] suffixes = splitPackage ? new[] { ".exe" } : new[] { ".exe", ".runtimeconfig.json", ".deps.json" };
+        foreach (string suffix in suffixes)
         {
             string relative = name + suffix;
             ValidateRelative(relative);
@@ -355,9 +359,8 @@ internal sealed class PortablePackageTransaction : IDisposable
             replacements.Add(relative, Child(StagedRoot, "DS4Windows" + suffix));
             aliases.Add(relative);
         }
-        // The apphost still targets DS4Windows.dll, whose canonical runtime
-        // configuration and dependencies remain required. Only the default
-        // executable is replaced by its configured name.
+        // A split apphost resolves both sidecars through its embedded Runtime
+        // assembly path regardless of the name of the executable.
         replacements.Remove("DS4Windows.exe");
         return aliases;
     }
