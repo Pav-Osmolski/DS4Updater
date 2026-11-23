@@ -4,8 +4,9 @@
 
 ## Compatibility and use
 
-DS4Updater 2.0.9 supports this fork's numeric DS4Windows releases and schema 1
-build receipts. DS4Windows 5.0.14 includes the matching fork update sources.
+DS4Updater 2.0.10 supports this fork's numeric DS4Windows releases and schema 1
+build receipts, including the `Runtime` layout introduced in DS4Windows 5.0.81.
+DS4Windows 5.0.14 includes the matching fork update sources.
 RC4.6.7 still checks upstream and needs one manual app upgrade.
 
 Managed installations use the matching verified Setup EXE. Portable updates

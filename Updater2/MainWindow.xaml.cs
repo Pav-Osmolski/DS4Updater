@@ -823,7 +823,7 @@ namespace DS4Updater
                 {
                     string fake_exe_name = File.ReadAllText(custom_exe_name_path).Trim();
                     bool valid = !string.IsNullOrEmpty(fake_exe_name) && !(fake_exe_name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0);
-                    // Attempt to copy executable and assembly config file
+                    // Legacy flat apphosts also use alias sidecars.
                     if (valid)
                     {
                         string current_exe_location = Path.Combine(exepath, "DS4Windows.exe");
@@ -834,11 +834,15 @@ namespace DS4Updater
                         string fake_conf_file = Path.Combine(exepath, $"{fake_exe_name}.runtimeconfig.json");
                         string fake_deps_file = Path.Combine(exepath, $"{fake_exe_name}.deps.json");
 
+                        bool usesRootSidecars = PortableApplicationFiles.GetInstalledAssemblyRelativePath(exepath) == PortableApplicationFiles.Assembly;
                         File.Copy(current_exe_location, fake_exe_file, true); // Copy exe file
 
                         // Copy needed app config and deps files
-                        File.Copy(current_conf_file_path, fake_conf_file, true);
-                        File.Copy(current_deps_file_path, fake_deps_file, true);
+                        if (usesRootSidecars)
+                        {
+                            File.Copy(current_conf_file_path, fake_conf_file, true);
+                            File.Copy(current_deps_file_path, fake_deps_file, true);
+                        }
                     }
                 }
 
